@@ -6,7 +6,7 @@ import optparse
 import shlex
 import sys
 
-def create_save_options():
+def create_export_options():
     usage = "usage: %prog <options> -- <expr>"
     parser = optparse.OptionParser()
     parser.add_option("-o", "--object", dest="objectName", help="input object")
@@ -28,7 +28,7 @@ def export_command(debugger, command, result, internal_dict):
     frame = thread.GetSelectedFrame()
 
     command_args = shlex.split(command)
-    parser = create_save_options()
+    parser = create_export_options()
     (options, args) = parser.parse_args(command_args)
     objectToPrint = options.objectName
     path = options.filename
@@ -43,12 +43,11 @@ def export_command(debugger, command, result, internal_dict):
 
         error = lldb.SBError()
         memoryBuffer = process.ReadMemory(bytes, length, error)
-        path='/Users/clee/Desktop/lala.txt'
         with open(path, "w") as dataFile:
             dataFile.write(memoryBuffer)
 
 def __lldb_init_module(debugger, internal_dict):
-    parser = create_save_options()
+    parser = create_export_options()
     # save_command.__doc__ = save_command.__doc__ + parser.format_help()
     debugger.HandleCommand('command script add -f export_to_file.export_command export')
     print 'The "export" python command has been installed and is ready for use'
